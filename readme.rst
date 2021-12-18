@@ -82,5 +82,5 @@ Comments
 For this code challenge, I coded a ``server.py`` module.
 It simulates the API server.
 Every time the client connects the server, it responds with different values of:
-``deductible``,``stop_loss`` and ``oop_max`` gotten randomly from  intervals received as argument.
+``deductible``, ``stop_loss`` and ``oop_max`` gotten randomly from  intervals received as argument.
 It uses the member ID and API number from the URL to generate the random values.
