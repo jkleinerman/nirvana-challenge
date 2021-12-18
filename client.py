@@ -16,7 +16,7 @@ class ApiClient(object):
     """Simulates the API client."""
 
     def __init__(self,
-                 server: server.ApiServer,
+                 api_server: server.ApiServer,
                  coalesce_strategy: str,
                  *base_api_urls: list[str]):
         """
@@ -64,6 +64,12 @@ class ApiClient(object):
                 self.oop_max_list.append(server_resp['oop_max'])
             except KeyError:
                 print('There is missing information in server response.')
+
+        # # For debug
+        # print(f'Deductible List: {self.deductible_list}\n'
+        #       f'Stop Loss List: {self.stop_loss_list}\n'
+        #       f'Oop Max List: {self.oop_max_list}\n'
+        #      )
 
 
     def output_to_user(self) -> str:
