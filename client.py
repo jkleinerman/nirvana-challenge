@@ -1,12 +1,13 @@
 import json
 import statistics
 import sys
+import argparse
 
 import server
 
 
 EXIT_FAILURE = 1
-strategy = {'min': min, 'max': max, 'mean': statistics.mean}
+strategy_funcs = {'min': min, 'max': max, 'mean': statistics.mean}
 
 
 class ApiClient(object):
@@ -19,7 +20,7 @@ class ApiClient(object):
         """
         self.api_server = api_server
         try:
-            self.coalesce_strategy = strategy[coalesce_strategy]
+            self.coalesce_strategy = strategy_funcs[coalesce_strategy]
         except KeyError:
             print(f'Invalid Coalesce Strategy: {coalesce_strategy}')
             print('Options are: "min", "max" or "mean"')
@@ -59,15 +60,21 @@ class ApiClient(object):
 
         try:
             deductible = self.coalesce_strategy(self.deductible_list)
+            deductible = round(deductible, 2)
             stop_loss = self.coalesce_strategy(self.stop_loss_list)
+            stop_loss = round(stop_loss, 2)
             oop_max = self.coalesce_strategy(self.oop_max_list)
+            oop_max = round(oop_max, 2)
         except (ValueError, statistics.StatisticsError):
             print("Client didn't get server information or server"
                   " didn't send all the information."
                  )
             return None
 
-        return f'{{"deductible": {deductible}, "stop_loss": {stop_loss}, "oop_max": {oop_max}}}'
+        return (f'{{"deductible": {deductible},'
+                f' "stop_loss": {stop_loss},'
+                f' "oop_max": {oop_max}}}'
+               )
 
 
 
@@ -76,12 +83,31 @@ class ApiClient(object):
 
 if __name__ == "__main__":
 
+    # Creating an argparse object to help the user to use correctly
+    # the command line arguments.
+    # The -t option is optional when the user wants to test the value
+    # of the objective against the Telnyx testing API
+    in_parser = argparse.ArgumentParser(description='Connect and coalesce data')
+    in_parser.add_argument('-i', '--member-id', type=int,
+                           dest='member_id', required=True, help='Member ID')
+
+    in_parser.add_argument('-s', '--strategy', type=str,
+                           dest='strategy', required=True,
+                           choices={'min','max','mean'},
+                           help='Coalesce Strategy')
+
+    args = vars(in_parser.parse_args())
+
+    member_id = args['member_id']
+    strategy = args['strategy']
+
+
     api_server = server.ApiServer()
-    api_client = ApiClient(api_server, 'min',
+    api_client = ApiClient(api_server, strategy,
                            'https://api1.com',
                            'https://api2.com',
                            'https://api3.com')
 
-    api_client.get_from_srv(member_id=1)
+    api_client.get_from_srv(member_id)
 
     print(api_client.output_to_user())
