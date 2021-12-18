@@ -35,7 +35,7 @@ class ApiServer(object):
         stop_loss = random.randrange(*self.stop_loss_interval, step)
         oop_max = random.randrange(*self.oop_max_interval, step)
 
-        return f'{{deductible: {deductible}, stop_loss: {stop_loss}, oop_max: {oop_max}}}'
+        return f'{{"deductible": {deductible}, "stop_loss": {stop_loss}, "oop_max": {oop_max}}}'
 
 
 if __name__ == "__main__":
